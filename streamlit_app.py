@@ -79,7 +79,3 @@ if selected_sub_categories:
 # Display selected options
 st.write(f"Selected Category: {category}")
 st.write(f"Selected Sub-Categories: {selected_sub_categories}")
-
-
-
-
