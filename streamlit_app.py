@@ -15,15 +15,15 @@ try:
     st.write("Column names:", df.columns.tolist())
     
     # Ensure the necessary columns exist in the dataframe
-    required_columns = ['Category', 'Sub-Category', 'Sales', 'Profit', 'Order Date']
+    required_columns = ['Category', 'Sub_Category', 'Sales', 'Profit', 'Order_Date']
     missing_columns = [col for col in required_columns if col not in df.columns]
     
     if missing_columns:
         st.error(f"The following required columns are missing in the CSV file: {missing_columns}")
         st.stop()
     
-    # Parse the 'Order Date' column if it exists
-    df['Order Date'] = pd.to_datetime(df['Order Date'])
+    # Parse the 'Order_Date' column if it exists
+    df['Order_Date'] = pd.to_datetime(df['Order_Date'])
     
 except ValueError as e:
     st.error(f"Error loading the CSV file: {e}")
@@ -43,7 +43,7 @@ st.dataframe(aggregated_df)
 st.bar_chart(aggregated_df, x="Category", y="Sales", color="#04f")
 
 # Aggregated sales by month
-df.set_index('Order Date', inplace=True)
+df.set_index('Order_Date', inplace=True)
 sales_by_month = df.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
 
 st.write("### Sales by Month")
@@ -79,12 +79,12 @@ st.write(f"Selected Sub-Categories: {selected_sub_categories}")
 
 # Filter the dataframe based on selected category and sub-categories
 if selected_sub_categories:
-    filtered_df = df[(df['Category'] == category) & (df['Sub-Category'].isin(selected_sub_categories))]
+    filtered_df = df[(df['Category'] == category) & (df['Sub_Category'].isin(selected_sub_categories))]
 
     # Step (3): Show a line chart of sales for the selected items in (2)
     st.write("### Sales Line Chart")
-    sales_chart = filtered_df.groupby('Order Date')['Sales'].sum().reset_index()
-    st.line_chart(sales_chart, x='Order Date', y='Sales')
+    sales_chart = filtered_df.groupby('Order_Date')['Sales'].sum().reset_index()
+    st.line_chart(sales_chart, x='Order_Date', y='Sales')
 
     # Calculate metrics
     total_sales = filtered_df['Sales'].sum()
@@ -105,6 +105,7 @@ if selected_sub_categories:
 # Display selected options
 st.write(f"Selected Category: {category}")
 st.write(f"Selected Sub-Categories: {selected_sub_categories}")
+
 
 
 
