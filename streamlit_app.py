@@ -9,32 +9,29 @@ st.write("### Input Data and Examples")
 # Load the dataset and handle potential errors
 try:
     df = pd.read_csv("Superstore_Sales_utf8.csv")
-    st.dataframe(df)
-    
-    # Print the column names for debugging
-    st.write("Column names:", df.columns.tolist())
-    
-    # Ensure the necessary columns exist in the dataframe
-    required_columns = ['Category', 'Sub_Category', 'Sales', 'Profit', 'Order_Date']
-    missing_columns = [col for col in required_columns if col not in df.columns]
-    
-    if missing_columns:
-        st.error(f"The following required columns are missing in the CSV file: {missing_columns}")
-        st.stop()
-    
-    # Parse the 'Order_Date' column if it exists
-    df['Order_Date'] = pd.to_datetime(df['Order_Date'])
-    
-except ValueError as e:
+except Exception as e:
     st.error(f"Error loading the CSV file: {e}")
     st.stop()
-except KeyError as e:
-    st.error(f"Error: The specified column {e} was not found in the CSV file.")
+
+# Print the column names for debugging
+st.write("Column names:", df.columns.tolist())
+
+# Ensure the necessary columns exist in the dataframe
+required_columns = ['Category', 'Sub_Category', 'Sales', 'Profit', 'Order_Date']
+missing_columns = [col for col in required_columns if col not in df.columns]
+
+if missing_columns:
+    st.error(f"The following required columns are missing in the CSV file: {missing_columns}")
     st.stop()
+
+# Parse the 'Order_Date' column if it exists
+df['Order_Date'] = pd.to_datetime(df['Order_Date'])
+
+st.dataframe(df)
 
 # Bar chart of sales by category
 st.write("### Bar Chart of Sales by Category")
-st.bar_chart(df, x="Category", y="Sales")
+st.bar_chart(df.groupby("Category")["Sales"].sum())
 
 # Aggregated bar chart of sales by category
 st.write("### Aggregated Bar Chart of Sales by Category")
@@ -44,11 +41,11 @@ st.bar_chart(aggregated_df, x="Category", y="Sales", color="#04f")
 
 # Aggregated sales by month
 df.set_index('Order_Date', inplace=True)
-sales_by_month = df.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
+sales_by_month = df['Sales'].resample('M').sum()
 
 st.write("### Sales by Month")
 st.dataframe(sales_by_month)
-st.line_chart(sales_by_month, y="Sales")
+st.line_chart(sales_by_month)
 
 st.write("## Your additions")
 
@@ -105,6 +102,7 @@ if selected_sub_categories:
 # Display selected options
 st.write(f"Selected Category: {category}")
 st.write(f"Selected Sub-Categories: {selected_sub_categories}")
+
 
 
 
