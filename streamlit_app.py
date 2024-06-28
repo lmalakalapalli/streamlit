@@ -4,31 +4,35 @@ import matplotlib.pyplot as plt
 
 st.title("Data App Assignment, on June 20th")
 
-st.write("### Input Data and Examples")
+# Load the dataset
 df = pd.read_csv("Superstore_Sales_utf8.csv", parse_dates=True)
 
 # Display the dataframe
 st.dataframe(df)
 
-# Display the columns of the dataframe to identify the correct column names
+# Display the column names
 st.write("### DataFrame Columns")
 st.write(df.columns)
 
-# Ensure 'Category' and 'Sub-Category' are in the dataframe
-if "Category" in df.columns and "Sub-Category" in df.columns:
+# Identify the correct column names for Category and Sub-Category
+category_col = "Category"
+sub_category_col = "Sub-Category"
 
+# Ensure 'Category' and 'Sub-Category' are in the dataframe
+if category_col in df.columns and sub_category_col in df.columns:
+    
     # (1) Add a drop down for Category
-    category = st.selectbox("Select a Category", df["Category"].unique())
+    category = st.selectbox("Select a Category", df[category_col].unique())
 
     # (2) Add a multi-select for Sub-Category in the selected Category
-    sub_categories = df[df["Category"] == category]["Sub-Category"].unique()
+    sub_categories = df[df[category_col] == category][sub_category_col].unique()
     selected_sub_categories = st.multiselect("Select Sub-Categories", sub_categories)
 
     if selected_sub_categories:
-        filtered_df = df[df["Sub-Category"].isin(selected_sub_categories)]
+        filtered_df = df[df[sub_category_col].isin(selected_sub_categories)]
 
         # (3) Show a line chart of sales for the selected items in (2)
-        sales_by_month_filtered = filtered_df.filter(items=['Sales']).groupby(pd.Grouper(freq='M')).sum()
+        sales_by_month_filtered = filtered_df.resample('M', on='Order_Date')['Sales'].sum()
         st.line_chart(sales_by_month_filtered, y="Sales")
 
         # (4) Show three metrics for the selected items in (2)
@@ -51,3 +55,4 @@ if "Category" in df.columns and "Sub-Category" in df.columns:
         )
 else:
     st.write("Error: 'Category' and 'Sub-Category' columns not found in the dataset")
+
